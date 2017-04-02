@@ -1,0 +1,53 @@
+<%- include('../partials/header.ejs') %>
+  <script src="/js/Chart.min.js"></script>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/public/javascripts/ws-chart.js"></script>
+  <div class="container">
+    <h1>Scale Info</h1>
+    <h3>Graph of last 50 points</h3>
+
+    <canvas id="scaleChart" height="100vh"></canvas>
+
+    <br><br>
+
+    <div class="scale-events">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Stat</th>
+            <th>Last updated at</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>5</th>
+            <th>5:30</th>
+          </tr>
+        </tobdy>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // let lastLabel = 0;
+      let chartObj = setupChart(Array(50));
+      // $(window).resize(setupChart);
+      // // getChartData();
+      // setInterval(() => { getAndUpdateChartData() }, 3000);
+      let scaleSocket = new WebSocket("ws://localhost:3000");
+      scaleSocket.onmessage = (event) => {
+        // console.log(event.data);
+        scaleD = JSON.parse(event.data).scaleData;
+        setupChart(scaleD.slice(scaleD.length-50));
+        // updateChart(chartObj, scaleD.slice(scaleD.length-50));
+      };
+
+      window.onbeforeunload = function() {
+        scaleSocket.onclose = function () {}; // disable onclose handler first
+        scaleSocket.close();
+      };
+    })();
+  </script>
+
+<%- include('../partials/footer.ejs') %>

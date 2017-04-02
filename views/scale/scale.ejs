@@ -1,0 +1,40 @@
+<%- include('../partials/header.ejs') %>
+  <script src="/js/Chart.min.js"></script>
+  <div class="container">
+    <h1>Scale Info</h1>
+    <h3>Graph of last 50 points</h3>
+
+    <canvas id="scaleChart" height="100vh"></canvas>
+    <script>
+      let ctx = document.getElementById("scaleChart");
+      let myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+                  labels: [...Array(50).keys()],
+                  datasets: [{
+                    label: 'Weight (AU)',
+                    data: [<%= scaleData.slice(1024-50) %>],
+                    backgroundColor: 'cornflowerblue',
+                    cubicInterpolationMode: 'monotone'
+                  }]
+              }
+        // data: {
+        //         labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+        //         datasets: [{
+        //           label: 'apples',
+        //           data: [12, 19, 3, 17, 6, 3, 7],
+        //           backgroundColor: "rgba(153,255,51,0.4)"
+        //         }, {
+        //           label: 'oranges',
+        //           data: [2, 29, 5, 5, 2, 3, 10],
+        //           backgroundColor: "rgba(255,153,0,0.4)"
+        //         }]
+        //       }
+      });
+    </script>
+
+    <%# scaleData.forEach(function(data) { %>
+      <!-- <span><%# data %>, </span> -->
+    <%# }); %>
+  </div>
+<%- include('../partials/footer.ejs') %>
