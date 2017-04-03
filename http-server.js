@@ -23,6 +23,7 @@ function(token, tokenSecret, profile, cb) {
   // be associated with a user record in the application's database, which
   // allows for account linking and authentication with other identity
   // providers.
+  console.log(token, tokenSecret);
   return cb(null, profile);
 }));
 
@@ -47,7 +48,7 @@ passport.deserializeUser(function(obj, cb) {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(cookieParser());
-app.use(require('cookie-parser')());
+app.use(require('cookie-parser')('keyboard cat'));
 app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
