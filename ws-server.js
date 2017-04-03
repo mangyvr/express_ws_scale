@@ -4,6 +4,8 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const passport = require('passport');
+const Strategy = require('passport-twitter').Strategy;
 
 const WSServer = require('ws').Server;
 const server = require('http').createServer();
@@ -13,6 +15,10 @@ const wss = new WSServer({
   server: server
 });
 
+// console.log(process.env.CONSUMER_KEY);
+// console.log(process.env.CONSUMER_SECRET);
+
+
 // Express setup
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -21,9 +27,8 @@ app.set('view engine', 'ejs');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+
+// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
 app.use('/js', express.static(__dirname + '/node_modules/jquery/dist')); // redirect JS jQuery

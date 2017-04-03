@@ -1,0 +1,8 @@
+<% if (user) { %>
+  <a href="#">Enable Twitter notifications</a>
+  |
+  <a href="/logout">Logout</a>
+<% } else { %>
+  <a href="/auth/twitter"><img src="/images/sign-in-with-twitter-link.png"/></a>
+<% } %>
+<hr>

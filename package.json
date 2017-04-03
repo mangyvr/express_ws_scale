@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "PORT=3000 nodemon ws-server.js"
+    "start": "source setenv.sh; PORT=3000 nodemon ws-server.js"
   },
   "dependencies": {
     "body-parser": "~1.16.0",
@@ -17,6 +17,8 @@
     "jquery": "^3.2.1",
     "morgan": "~1.7.0",
     "nodemon": "^1.11.0",
+    "passport": "^0.3.2",
+    "passport-twitter": "^1.0.4",
     "pg": "^6.1.5",
     "pg-hstore": "^2.3.2",
     "sequelize": "^3.30.3",
