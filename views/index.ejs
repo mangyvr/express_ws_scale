@@ -1,11 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title>Coffee Info</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <script src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="/stylesheets/scale-style.css"> -->
+    
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+
+    <div class="text-center">
+      <h1>Welcome to Coffee Info</h1>
+      <button id="enterButton" class="btn btn-success">Click to Enter</button>
+    </div>
+
+    <script>
+    document.getElementById('enterButton').addEventListener('click',
+                                              () => { window.location.href = "http://localhost:3000/scale_ws"; } );
+    </script>
   </body>
 </html>

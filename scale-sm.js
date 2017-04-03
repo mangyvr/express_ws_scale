@@ -44,25 +44,15 @@ class Scale_sm {
     this.modelObj.scaleStatsModel = scaleStatsModel;
   }
 
-  setScaleId(scaleId) {
-    this.scale.id = scaleId;
-  }
+  setScaleId(scaleId) { this.scale.id = scaleId; }
 
-  getScaleId() {
-    return this.scale.id;
-  }
+  getScaleId() { return this.scale.id;}
 
-  getCurrState() {
-    return this.currentState;
-  }
+  getCurrState() { return this.currentState; }
 
-  getNextState() {
-    return this.nextState;
-  }
+  getNextState() { return this.nextState; }
 
-  transitionReady() {
-    return this.currentState !== this.nextState;
-  }
+  transitionReady() {return this.currentState !== this.nextState; }
 
   getAvg(weight) {
     // This will push weight to the avg array until max length is achieved
@@ -103,7 +93,7 @@ class Scale_sm {
          console.log('Coffee low!!!!'); // DB write here?
          this.alreadyLow = true;
          this.modelObj.scaleStats
-           .create({low_event: true, scaleId: this.scale.id})
+           .create({low_event: true, ScaleId: this.scale.id})
           //  .then( () => { this.alreadyLow = true; } );
         }
       }
@@ -112,7 +102,7 @@ class Scale_sm {
       console.log('Coffee off the scale!!!!'); // DB write here?
       // Insert row with 'off_event' set to true
       this.modelObj.scaleStats
-        .create({off_event: true, scaleId: this.scale.id});
+        .create({off_event: true, ScaleId: this.scale.id});
         // .then(console.log);
         this.alreadyLow = false;  // set so coffee_low db write can occur
         this.resetAvgWeightObj();
@@ -120,7 +110,7 @@ class Scale_sm {
       this.nextState = 'coffee_present';
       console.log('Coffee on the scale!!!!'); // DB write here?
       this.modelObj.scaleStats
-        .create({on_event: true, scaleId: this.scale.id});
+        .create({on_event: true, ScaleId: this.scale.id});
         // .then(console.log);
     } else { // invalid state
       console.error(this.currentState);

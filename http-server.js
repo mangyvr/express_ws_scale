@@ -8,7 +8,7 @@ app.use(bodyParser.json());
 app.get('/', function(req, res, next) {
   // res.send('respond with a resource');
   // console.log(res.locals.scaleData);
-  res.render('index.ejs', { title: 'Scale'});
+  res.render('index.ejs');
 });
 
 app.get('/scale_ws', function(req, res, next) {

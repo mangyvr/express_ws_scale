@@ -4,43 +4,81 @@
   <script src="/public/javascripts/ws-chart.js"></script>
   <div class="container">
     <h1>Scale Info</h1>
-    <h3>Graph of last 50 points</h3>
-
+    <h3 id="scaleChartText" class="text-center">Last 50 points</h3>
     <canvas id="scaleChart" height="100vh"></canvas>
 
-    <br><br>
+    <h3 id="barChartCurrDayText" class="text-center">Events from past 24 hours</h3>
+    <canvas id="barChartCurrDay" height="75vh"></canvas>
 
-    <div class="scale-events">
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th>Stat</th>
-            <th>Last updated at</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th>5</th>
-            <th>5:30</th>
-          </tr>
-        </tobdy>
-      </table>
+    <h3 id="barChartSelectText" class="text-center">Events from past <span id="timeframeText">week<span></h3>
+
+    <!-- <div class="dropdown text-center">
+      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        Select event timeframe
+        <span class="caret"></span>
+      </button>
+      <ul class="text-center dropdown-menu" aria-labelledby="dropdownMenu1">
+        <li>Last week</li>
+        <li>Last month</li>
+        <li>Last year</li>
+      </ul>
+       <button class="btn btn-primary">Submit</button>
+    </div> -->
+
+    <div class="event-buttons text-center">
+      <button id="lastWeekButton" class="btn btn-info">Last Week</button>
+      <button id="lastMonthButton" class="btn btn-info">Last Month</button>
+      <button id="lastYearButton" class="btn btn-info">Last Year</button>
     </div>
+    <canvas id="barChartSelect" height="75vh"></canvas>
   </div>
+
+  <br><br>
 
   <script>
     (function() {
-      // let lastLabel = 0;
-      let chartObj = setupChart(Array(50));
+      let chartObj = setupLineChart(Array(50));
+      let scaleSocket = new WebSocket("ws://localhost:3000");
+      let currDayBarObj = setupBarChart("barChartCurrDay", 'Number of Events', {});
+      let barChartSelectObj = setupBarChart("barChartSelect", 'Number of Events', {});
       // $(window).resize(setupChart);
       // // getChartData();
       // setInterval(() => { getAndUpdateChartData() }, 3000);
-      let scaleSocket = new WebSocket("ws://localhost:3000");
+
+      document.getElementById('lastWeekButton').addEventListener('click',
+                                                () => { sendChartWS(scaleSocket, 'lastWeek') } );
+      document.getElementById('lastMonthButton').addEventListener('click',
+                                                () => { sendChartWS(scaleSocket, 'lastMonth') } );
+      document.getElementById('lastYearButton').addEventListener('click',
+                                                () => { sendChartWS(scaleSocket, 'lastYear') } );
+
+      scaleSocket.onopen = (event) => {
+        // Try to get data for current day ASAP
+        scaleSocket.send( JSON.stringify( { queryType: 'lastDay' } ) );
+        scaleSocket.send( JSON.stringify( { queryType: 'lastWeek' } ) );
+      }
+
       scaleSocket.onmessage = (event) => {
         // console.log(event.data);
-        scaleD = JSON.parse(event.data).scaleData;
-        setupChart(scaleD.slice(scaleD.length-50));
-        // updateChart(chartObj, scaleD.slice(scaleD.length-50));
+        let incomingData = JSON.parse(event.data);
+
+        if ( incomingData.hasOwnProperty("scaleData") ) {
+          let scaleD = incomingData.scaleData;
+          // setupLineChart(scaleD.slice(scaleD.length-50));
+          updateLineChart(chartObj, scaleD.slice(scaleD.length-50));
+        }
+        if ( incomingData.hasOwnProperty("eventData") ) {
+          if (incomingData.queryType === 'lastDay') {
+            updateBarChart(currDayBarObj, incomingData.eventData);
+            // console.log(incomingData);
+          } else if ( incomingData.queryType.match(/^(lastWeek|lastMonth|lastYear)$/) ) {
+            updateBarChart(barChartSelectObj, incomingData.eventData);
+            document.getElementById('timeframeText').innerHTML = incomingData.queryType.split('last')[1].toLowerCase();
+            console.log(incomingData);
+          }
+        }
+        // scaleD = JSON.parse(event.data).scaleData;
+
       };
 
       window.onbeforeunload = function() {
@@ -48,6 +86,10 @@
         scaleSocket.close();
       };
     })();
+
+    function sendChartWS(ws, queryType) {
+      ws.send( JSON.stringify( { queryType: queryType } ) );
+    }
   </script>
 
 <%- include('../partials/footer.ejs') %>
