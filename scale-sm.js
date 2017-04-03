@@ -1,7 +1,8 @@
 const wrapQuery = require('./wrap-query.js');
+const rp = require('request-promise');
 
 class Scale_sm {
-  constructor(scaleId, scaleModel, scaleStatsModel) {
+  constructor(scaleId, scaleModel, scaleStatsModel, userModel) {
     // Available states: coffee_not_present, coffee_off, coffee_on, coffee_present
     this.currentState = 'coffee_not_present';  // set as initial state
     this.nextState = 'coffee_not_present';
@@ -23,16 +24,39 @@ class Scale_sm {
       id: scaleId
     };
 
+    // For twitter
+    this.user = {
+      userModel: userModel,
+      // id: '',
+      oauthToken: '',
+      oauthSecret: '',
+      enableTweet: true
+    }
+
     this.modelObj = {
       scale: scaleModel,
       scaleStats: scaleStatsModel
     }; // Should have scaleModel: Scale, scaleStatsModel: Scale_stats
 
-    this.modelObj.scale.findById(this.scale.id).then(function(scale) {
-      console.log(`Scale initial state: ${scale.dataValues.state}`);
-      this.currentState = scale.dataValues.state;
-      this.nextState = scale.dataValues.state;
-    });
+    this.modelObj.scale
+      .findById(this.scale.id)
+      .then( (scale) => {
+        console.log(`Scale initial state: ${scale.dataValues.state}`);
+        this.currentState = scale.dataValues.state;
+        this.nextState = scale.dataValues.state;
+      })
+      .catch(console.error);
+
+    this.user.userModel
+      .findAll( { limit: 1 } )
+      .then( (user) => {
+        // console.log(user[0].dataValues.id);
+        this.user.id = user[0].dataValues.id;
+        this.user.oauthToken = user[0].dataValues.oauth_token;
+        this.user.oauthSecret = user[0].dataValues.oauth_secret;
+      })
+      .then( () => { this.user.enableTweet = true; } )
+      .catch( () => { console.error('No user in DB.') } );
   }
 
   // get currentState() {
@@ -56,6 +80,56 @@ class Scale_sm {
   getNextState() { return this.nextState; }
 
   setWssWs(wssWs) { this.wssWs = wssWs };
+
+  setOauth(userId) {
+    this.user.userModel
+        .findAll( { limit: 1 } )
+        .then( (user) => {
+          // console.log(user[0].dataValues.id);
+          this.user.id = user[0].dataValues.id;
+          this.user.oauthToken = user[0].dataValues.oauth_token;
+          this.user.oauthSecret = user[0].dataValues.oauth_secret;
+        })
+        .then( () => { this.user.enableTweet = true; } )
+        .catch( () => { console.error('No user in DB.') } );
+  };
+
+  toggleTweets() { this.user.enableTweet = this.user.enableTweet ? false : true;  };
+
+  sendTweet(status) {
+    const options = {
+        method: 'POST',
+        uri: 'https://api.twitter.com/1.1/statuses/update.json',
+        oauth:{
+          consumer_key:process.env.CONSUMER_KEY,
+          consumer_secret:process.env.CONSUMER_SECRET,
+          token:this.user.oauthToken,
+          token_secret:this.user.oauthSecret
+        },
+        qs: {
+          status: status,
+          // oauth_token: this.user.oauthToken
+        },
+        // body: {
+        //   status: status
+        // },
+        // headers: {
+        //   'Authorization': `OAuth oauth_consumer_key="${process.ENV.CONSUMER_KEY}",
+        //                           oauth_token="${this.user.oauthToken}",
+        //                           oauth_signature_method="HMAC-SHA1",
+        //                           oauth_timestamp="(new Date).getTime()",
+        //                           oauth_nonce="AnKH0X",
+        //                           oauth_version="1.0",
+        //                           oauth_signature="d1Uv4fAdfWYDwIGJIwDo9v4VFJE%3D"`
+        // },
+        json: true // Automatically stringifies the body to JSON
+    };
+
+    rp(options)
+        // .then( (parsedBody) => { console.log(parsedBody); } )
+        .then( () => { console.log(`Tweeted: ${status}`) }  )
+        .catch( console.error );
+  }
 
   transitionReady() { return this.currentState !== this.nextState; }
 
@@ -105,7 +179,9 @@ class Scale_sm {
          this.alreadyLow = true;
          this.modelObj.scaleStats
            .create( {low_event: true, ScaleId: this.scale.id} )
-           .then( () => { wrapQuery(1, 'day', this.modelObj.scaleStats, this.wssWs, 'lastDay'); } );
+           .then( () => { wrapQuery(1, 'day', this.modelObj.scaleStats, this.wssWs, 'lastDay'); } )
+           .then( () => { this.sendTweet(`Low on coffee! ${Date()}`);} )
+           .catch(console.error);
           //  .then( () => { } );
           //  .then( () => { this.alreadyLow = true; } );
         }
@@ -116,7 +192,9 @@ class Scale_sm {
       // Insert row with 'off_event' set to true
       this.modelObj.scaleStats
         .create({off_event: true, ScaleId: this.scale.id})
-        .then( () => { wrapQuery(1, 'day', this.modelObj.scaleStats, this.wssWs, 'lastDay'); } );
+        .then( () => { wrapQuery(1, 'day', this.modelObj.scaleStats, this.wssWs, 'lastDay'); } )
+        .then( () => { this.sendTweet(`Coffee off the scale! ${Date()}`);} )
+        .catch(console.error);
         // .then(console.log);
         this.alreadyLow = false;  // set so coffee_low db write can occur
         this.resetAvgWeightObj();
@@ -126,8 +204,11 @@ class Scale_sm {
       // console.log(this.wssWs);
       this.modelObj.scaleStats
         .create({on_event: true, ScaleId: this.scale.id})
-        .then( () => { wrapQuery(1, 'day', this.modelObj.scaleStats, this.wssWs, 'lastDay'); } );
+        .then( () => { wrapQuery(1, 'day', this.modelObj.scaleStats, this.wssWs, 'lastDay'); } )
+        .then( () => { this.sendTweet(`Coffee on the scale! ${Date()}`);} )
+        .catch(console.error);
         // .then(console.log);
+
     } else { // invalid state
       console.error(this.currentState);
       console.error('SM in invalid state!!!');

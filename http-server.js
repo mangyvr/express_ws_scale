@@ -7,7 +7,6 @@ const Strategy = require('passport-twitter').Strategy;
 
 const {User} = require('./models/index');
 
-
 // Configure the Twitter strategy for use by Passport.
 //
 // OAuth 1.0-based strategies require a `verify` function which receives the
@@ -26,20 +25,48 @@ function(token, tokenSecret, profile, cb) {
   // be associated with a user record in the application's database, which
   // allows for account linking and authentication with other identity
   // providers.
-  User
-    .findOrCreate({
-                      where: {
-                        uid: profile.id
-                      },
-                      defaults: {
-                                  provider: 'twitter',
-                                  oauth_token: token,
-                                  oauth_secret: tokenSecret,
-                                  oauth_raw_data: JSON.stringify(profile),
-                      },
-                    })
-    .then( (user) => { return cb(null, user) } )
-    .catch( (err) => { return cb(err, null) } );
+  // User
+  //   .findOrCreate({
+  //                     where: {
+  //                       uid: profile.id
+  //                     },
+  //                     defaults: {
+  //                                 provider: 'twitter',
+  //                                 oauth_token: token,
+  //                                 oauth_secret: tokenSecret,
+  //                                 oauth_raw_data: JSON.stringify(profile),
+  //                     },
+  //                   })
+  //   .then( (user) => { return cb(null, user) } )
+  //   .catch( (err) => { return cb(err, null) } );
+  User.findOne({where: { id: 1 } })
+      .then( (foundItem) => {
+          if (!foundItem) {
+              // Item not found, create a new one
+              User.create({
+                            id: 1,
+                            uid: profile.id,
+                            provider: 'twitter',
+                            oauth_token: token,
+                            oauth_secret: tokenSecret,
+                            oauth_raw_data: JSON.stringify(profile),
+                          })
+                  .then( (user) => { return cb(null, user.dataValues.id) } )
+                  .catch( (err) => { return cb(err, null) } );
+          } else {
+              // Found an item, update it
+              User.update({
+                            uid: profile.id,
+                            provider: 'twitter',
+                            oauth_token: token,
+                            oauth_secret: tokenSecret,
+                            oauth_raw_data: JSON.stringify(profile),
+                          }, { where: { id: 1 } })
+                  .then( (user) => { return cb(null, user) } )
+                  .catch( (err) => { return cb(err, null) } );
+              ;
+          }
+      }).catch(console.error);
   // return cb(null, profile);
 }));
 
@@ -54,14 +81,15 @@ function(token, tokenSecret, profile, cb) {
 // example does not have a database, the complete Twitter profile is serialized
 // and deserialized.
 passport.serializeUser(function(user, cb) {
-  // console.log(user);
+  console.log(user);
   // console.log(user[0].dataValues.id);
-  cb(null, user[0].dataValues.id);
+  cb(null, user);
 });
 
 passport.deserializeUser(function(id, cb) {
+  console.log(`deserializing: id is ${id}`);
   User
-    .findById(id)
+    .findById(id.toString())
     .then( (user) => { return cb(null, user) } )
     .catch( (err) => { return cb(err, null) } );
   // cb(null, obj);
@@ -71,7 +99,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(cookieParser());
 app.use(require('cookie-parser')('keyboard cat'));
-app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true, cookie: { maxAge: 600000 } }));
+app.use(require('express-session')({ secret: 'keyboard cat',
+                                     resave: true,
+                                     rolling: true,
+                                     saveUninitialized: false,
+                                     cookie: { maxAge: 600000 } }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -93,6 +125,7 @@ app.get('/auth/twitter',
 app.get('/auth/twitter/callback',
   passport.authenticate('twitter', { failureRedirect: '/scale_ws' }),
   function(req, res) {
+    // console.log(`ssm: ${res.locals.ssm}`);
     res.redirect('/scale_ws');
   });
 

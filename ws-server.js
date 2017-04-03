@@ -5,7 +5,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const passport = require('passport');
-const Strategy = require('passport-twitter').Strategy;
+// const Strategy = require('passport-twitter').Strategy;
 
 const WSServer = require('ws').Server;
 const server = require('http').createServer();
@@ -36,14 +36,11 @@ app.use('/js', express.static(__dirname + '/node_modules/chart.js/dist')); // re
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
 app.use("/public", express.static(__dirname + "/public"));
 
-// http server
-server.on('request', app);
-
 // WS portion
 // WS client (from Rpi)
 // instantiate and pass in scale state machine
 const scaleSm = require('./scale-sm.js');
-const {Scale, Scale_stats} = require('./models/index');
+const {Scale, Scale_stats, User} = require('./models/index');
 // console.log('creating SSM');
 // ssm.setScaleModel( Scale, Scale_stats );
 
@@ -53,8 +50,16 @@ let scaleData = Array(1024).fill(0, 0, 1023);
 const WebSocket = require('ws');
 const ws = new WebSocket('https://4f568726.ngrok.io');
 // Hardcoded scale id for now
-const ssm = new scaleSm( 1, Scale, Scale_stats );
+const ssm = new scaleSm( 1, Scale, Scale_stats, User );
 wsClient(scaleData, ssm, ws);
+
+app.use(function(req,res,next) {
+  console.log(`User hopefully from passport: ${res.user}`);
+  next();
+});
+
+// http server
+server.on('request', app);
 
 const wrapQuery = require('./wrap-query.js');
 

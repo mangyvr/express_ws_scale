@@ -56,6 +56,8 @@
                                                 () => { sendChartWS(scaleSocket, 'lastMonth') } );
       document.getElementById('lastYearButton').addEventListener('click',
                                                 () => { sendChartWS(scaleSocket, 'lastYear') } );
+      // document.getElementById('enableTweet').addEventListener('click',
+      //                                           () => { sendChartWS(scaleSocket, 'lastYear') } );
 
       scaleSocket.onopen = (event) => {
         // Try to get data for current day ASAP
