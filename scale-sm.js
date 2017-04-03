@@ -1,9 +1,12 @@
+const wrapQuery = require('./wrap-query.js');
+
 class Scale_sm {
   constructor(scaleId, scaleModel, scaleStatsModel) {
     // Available states: coffee_not_present, coffee_off, coffee_on, coffee_present
     this.currentState = 'coffee_not_present';  // set as initial state
     this.nextState = 'coffee_not_present';
-    // this.alreadyLow = false; // set as object prop to prevent multiple writes
+    this.alreadyLow = false; // set as object prop to prevent multiple writes
+    this.wssWs = ''; // Cannot set this in constructor wss is not setup yet
 
     this.avgWeightObj = {
       maxLength: 20, //take 10 samples
@@ -52,7 +55,15 @@ class Scale_sm {
 
   getNextState() { return this.nextState; }
 
-  transitionReady() {return this.currentState !== this.nextState; }
+  setWssWs(wssWs) { this.wssWs = wssWs };
+
+  transitionReady() { return this.currentState !== this.nextState; }
+
+  queryAndSend() {
+    if ( this.wssWs ) {
+      wrapQuery(1, 'day', this.modelObj.scaleStats, this.wssWs, 'lastDay');
+    }
+  }
 
   getAvg(weight) {
     // This will push weight to the avg array until max length is achieved
@@ -93,7 +104,9 @@ class Scale_sm {
          console.log('Coffee low!!!!'); // DB write here?
          this.alreadyLow = true;
          this.modelObj.scaleStats
-           .create({low_event: true, ScaleId: this.scale.id})
+           .create( {low_event: true, ScaleId: this.scale.id} )
+           .then( () => { wrapQuery(1, 'day', this.modelObj.scaleStats, this.wssWs, 'lastDay'); } );
+          //  .then( () => { } );
           //  .then( () => { this.alreadyLow = true; } );
         }
       }
@@ -102,15 +115,18 @@ class Scale_sm {
       console.log('Coffee off the scale!!!!'); // DB write here?
       // Insert row with 'off_event' set to true
       this.modelObj.scaleStats
-        .create({off_event: true, ScaleId: this.scale.id});
+        .create({off_event: true, ScaleId: this.scale.id})
+        .then( () => { wrapQuery(1, 'day', this.modelObj.scaleStats, this.wssWs, 'lastDay'); } );
         // .then(console.log);
         this.alreadyLow = false;  // set so coffee_low db write can occur
         this.resetAvgWeightObj();
     } else if (this.currentState === 'coffee_on' ) {
       this.nextState = 'coffee_present';
       console.log('Coffee on the scale!!!!'); // DB write here?
+      // console.log(this.wssWs);
       this.modelObj.scaleStats
-        .create({on_event: true, ScaleId: this.scale.id});
+        .create({on_event: true, ScaleId: this.scale.id})
+        .then( () => { wrapQuery(1, 'day', this.modelObj.scaleStats, this.wssWs, 'lastDay'); } );
         // .then(console.log);
     } else { // invalid state
       console.error(this.currentState);

@@ -41,14 +41,14 @@ function setupBarChart(id, label, dataObj) {
                 legend: {
                   display: false
                 },
-                scales: {
+                // scales: {
                         // xAxes: [{
                         //   stacked: true
                         // }],
                         // yAxes: [{
                         //   stacked: true
                         // }]
-                }
+                // }
              }
   });
   return myChart;
@@ -90,5 +90,10 @@ function updateBarChart(chartObj, dataObj) {
   // ]
   chartObj.data.labels = Object.keys(dataObj);
   chartObj.data.datasets[0].data = Object.values(dataObj);
+  // chartObj.data.labels.push('');
+  // Workaround -- not sure why this is required
+  // Otherwise lowEvent (last data point) sometimes disappears
+  chartObj.data.datasets[0].data.push('');
+  // console.log(chartObj.data.labels, chartObj.data.datasets[0].data );
   chartObj.update();
 }

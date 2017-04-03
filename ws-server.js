@@ -4,7 +4,6 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const Sequelize = require('sequelize');
 
 const WSServer = require('ws').Server;
 const server = require('http').createServer();
@@ -12,11 +11,6 @@ const app = require('./http-server');
 
 const wss = new WSServer({
   server: server
-});
-
-// Need this to make raw SQL queries
-const sequelize = new Sequelize('scale_dev', 'tyt', null ,{
-  dialect: 'postgres'
 });
 
 // Express setup
@@ -46,8 +40,6 @@ server.on('request', app);
 const scaleSm = require('./scale-sm.js');
 const {Scale, Scale_stats} = require('./models/index');
 // console.log('creating SSM');
-// Hardcoded scale id
-const ssm = new scaleSm( 1, Scale, Scale_stats );
 // ssm.setScaleModel( Scale, Scale_stats );
 
 const wsClient = require('./ws-client.js');
@@ -55,12 +47,19 @@ let scaleData = Array(1024).fill(0, 0, 1023);
 // Establish WS outside so can be used in WS Server
 const WebSocket = require('ws');
 const ws = new WebSocket('https://4f568726.ngrok.io');
+// Hardcoded scale id for now
+const ssm = new scaleSm( 1, Scale, Scale_stats );
 wsClient(scaleData, ssm, ws);
+
+const wrapQuery = require('./wrap-query.js');
 
 // WS server
 wss.on('connection', function connection(wssWs) {
   let msgCount = 0;
   const RESEND_THRESHOLD = 5;
+  console.log('WSS created');
+  ssm.setWssWs(wssWs);
+
   // this event is for the client (rcv from Rpi)
   ws.on('message', function incoming(data, flags) {
     msgCount++;
@@ -92,35 +91,6 @@ wss.on('connection', function connection(wssWs) {
   })
 });
 
-function wrapQuery(num, unit, model, ws, queryType) {
-  Promise.all([
-    queryForLast(num, unit, 'on_event', model),
-    queryForLast(num, unit, 'off_event', model),
-    queryForLast(num, unit, 'low_event', model)
-  ])
-  .then( (result_arr) => {
-    let eventData = {
-      onEvent: result_arr[0],
-      offEvent: result_arr[1],
-      lowEvent: result_arr[2],
-    }
-    console.log(eventData);
-    ws.send(JSON.stringify( { queryType: queryType, eventData: eventData } ));
-  });
-}
-
-function queryForLast(num, unit, event, model) {
-  return new Promise((resolve, reject) => {
-    sequelize.query(`SELECT COUNT(*) FROM "Scale_stats" WHERE "createdAt" > current_date - interval '${num}' ${unit} AND ${event}=true`,
-      { model: model })
-      .then((data) => {
-        // console.log(data[0].dataValues.count);
-        resolve(data[0].dataValues.count);
-      })
-      .catch((reason) => { reject(reason) });
-  });
-
-}
 
 server.listen(process.env.PORT, function() {
   console.log(`http/ws server listening on ${process.env.PORT}`);
