@@ -1,6 +1,6 @@
-let express = require('express');
-let app = express();
-let bodyParser = require('body-parser');
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const Strategy = require('passport-twitter').Strategy;
@@ -23,7 +23,7 @@ function(token, tokenSecret, profile, cb) {
   // be associated with a user record in the application's database, which
   // allows for account linking and authentication with other identity
   // providers.
-  console.log(token, tokenSecret);
+  console.log(profile);
   return cb(null, profile);
 }));
 
@@ -49,7 +49,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(cookieParser());
 app.use(require('cookie-parser')('keyboard cat'));
-app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
+app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true, cookie: { maxAge: 60000 } }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -61,7 +61,7 @@ app.get('/', function(req, res, next) {
 });
 
 app.get('/scale_ws', function(req, res, next) {
-  console.log(req.user);
+  // console.log(req.user);
   res.render('scale/scale-ws.ejs', {user: req.user});
 });
 
