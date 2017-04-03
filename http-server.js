@@ -5,6 +5,9 @@ const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const Strategy = require('passport-twitter').Strategy;
 
+const {User} = require('./models/index');
+
+
 // Configure the Twitter strategy for use by Passport.
 //
 // OAuth 1.0-based strategies require a `verify` function which receives the
@@ -23,8 +26,21 @@ function(token, tokenSecret, profile, cb) {
   // be associated with a user record in the application's database, which
   // allows for account linking and authentication with other identity
   // providers.
-  console.log(profile);
-  return cb(null, profile);
+  User
+    .findOrCreate({
+                      where: {
+                        uid: profile.id
+                      },
+                      defaults: {
+                                  provider: 'twitter',
+                                  oauth_token: token,
+                                  oauth_secret: tokenSecret,
+                                  oauth_raw_data: JSON.stringify(profile),
+                      },
+                    })
+    .then( (user) => { return cb(null, user) } )
+    .catch( (err) => { return cb(err, null) } );
+  // return cb(null, profile);
 }));
 
 
@@ -38,18 +54,24 @@ function(token, tokenSecret, profile, cb) {
 // example does not have a database, the complete Twitter profile is serialized
 // and deserialized.
 passport.serializeUser(function(user, cb) {
-  cb(null, user);
+  // console.log(user);
+  // console.log(user[0].dataValues.id);
+  cb(null, user[0].dataValues.id);
 });
 
-passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
-
+passport.deserializeUser(function(id, cb) {
+  User
+    .findById(id)
+    .then( (user) => { return cb(null, user) } )
+    .catch( (err) => { return cb(err, null) } );
+  // cb(null, obj);
 });
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(cookieParser());
 app.use(require('cookie-parser')('keyboard cat'));
-app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true, cookie: { maxAge: 60000 } }));
+app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true, cookie: { maxAge: 600000 } }));
 app.use(passport.initialize());
 app.use(passport.session());
 
