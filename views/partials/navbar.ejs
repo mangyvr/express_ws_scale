@@ -1,8 +1,7 @@
 <% if (user) { %>
-  <a id="enableTweet" href="">Enable Twitter notifications</a>
+  <button id="enableTweet" class="btn btn-primary">Disable Tweets</button>
   |
   <a href="/logout">Logout</a>
-  <%= user %>
 <% } else { %>
   <a href="/auth/twitter"><img src="/images/sign-in-with-twitter-link.png"/> to control notifications</a>
 <% } %>

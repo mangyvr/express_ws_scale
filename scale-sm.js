@@ -1,5 +1,6 @@
 const wrapQuery = require('./wrap-query.js');
 const rp = require('request-promise');
+const WebSocket = require('ws');
 
 class Scale_sm {
   constructor(scaleId, scaleModel, scaleStatsModel, userModel) {
@@ -30,7 +31,7 @@ class Scale_sm {
       // id: '',
       oauthToken: '',
       oauthSecret: '',
-      enableTweet: true
+      enableTweet: false
     }
 
     this.modelObj = {
@@ -54,9 +55,11 @@ class Scale_sm {
         this.user.id = user[0].dataValues.id;
         this.user.oauthToken = user[0].dataValues.oauth_token;
         this.user.oauthSecret = user[0].dataValues.oauth_secret;
+        this.user.enableTweet = user[0].dataValues.enable_tweet;
       })
-      .then( () => { this.user.enableTweet = true; } )
-      .catch( () => { console.error('No user in DB.') } );
+      .then( () => { this.sendTweetEnable(this.wssWs); } )
+      .catch(console.error);
+      // .catch( () => { console.error('No user in DB.') } );
   }
 
   // get currentState() {
@@ -81,7 +84,10 @@ class Scale_sm {
 
   setWssWs(wssWs) { this.wssWs = wssWs };
 
-  setOauth(userId) {
+  // Sets to the most recent version in DB
+  // Should be done on every page load
+  setOauth() {
+    console.log('Updating SSM Oauth tokens');
     this.user.userModel
         .findAll( { limit: 1 } )
         .then( (user) => {
@@ -89,14 +95,34 @@ class Scale_sm {
           this.user.id = user[0].dataValues.id;
           this.user.oauthToken = user[0].dataValues.oauth_token;
           this.user.oauthSecret = user[0].dataValues.oauth_secret;
+          this.user.enableTweet = user[0].dataValues.enable_tweet;
         })
-        .then( () => { this.user.enableTweet = true; } )
-        .catch( () => { console.error('No user in DB.') } );
+        .then( () => { this.sendTweetEnable(this.wssWs); } )
+        .catch( console.error );
   };
 
-  toggleTweets() { this.user.enableTweet = this.user.enableTweet ? false : true;  };
+  toggleTweets() {
+    console.log(`enableTweet: ${this.user.enableTweet}`);
+    this.user.enableTweet = this.user.enableTweet ? false : true;
+    this.user.userModel.update( { enable_tweet: this.user.enableTweet },
+                 { where: { id: 1 } } )
+        .then( () => { this.sendTweetEnable(this.wssWs); } )
+        .catch( console.error );
+    console.log(`enableTweet after toggle: ${this.user.enableTweet}`);
+  };
+
+  getEnableTweetValue() {
+    return this.user.enableTweet;
+  }
+
+  sendTweetEnable(ws) {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify( { tweetEnabled: this.user.enableTweet } ));
+    }
+  }
 
   sendTweet(status) {
+    if ( this.user.enableTweet === false ) return;
     const options = {
         method: 'POST',
         uri: 'https://api.twitter.com/1.1/statuses/update.json',
@@ -108,20 +134,7 @@ class Scale_sm {
         },
         qs: {
           status: status,
-          // oauth_token: this.user.oauthToken
         },
-        // body: {
-        //   status: status
-        // },
-        // headers: {
-        //   'Authorization': `OAuth oauth_consumer_key="${process.ENV.CONSUMER_KEY}",
-        //                           oauth_token="${this.user.oauthToken}",
-        //                           oauth_signature_method="HMAC-SHA1",
-        //                           oauth_timestamp="(new Date).getTime()",
-        //                           oauth_nonce="AnKH0X",
-        //                           oauth_version="1.0",
-        //                           oauth_signature="d1Uv4fAdfWYDwIGJIwDo9v4VFJE%3D"`
-        // },
         json: true // Automatically stringifies the body to JSON
     };
 

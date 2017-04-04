@@ -50,6 +50,7 @@ function(token, tokenSecret, profile, cb) {
                             oauth_token: token,
                             oauth_secret: tokenSecret,
                             oauth_raw_data: JSON.stringify(profile),
+                            enable_tweet: true
                           })
                   .then( (user) => { return cb(null, user.dataValues.id) } )
                   .catch( (err) => { return cb(err, null) } );
@@ -61,10 +62,10 @@ function(token, tokenSecret, profile, cb) {
                             oauth_token: token,
                             oauth_secret: tokenSecret,
                             oauth_raw_data: JSON.stringify(profile),
+                            enable_tweet: true
                           }, { where: { id: 1 } })
                   .then( (user) => { return cb(null, user) } )
                   .catch( (err) => { return cb(err, null) } );
-              ;
           }
       }).catch(console.error);
   // return cb(null, profile);
@@ -81,13 +82,13 @@ function(token, tokenSecret, profile, cb) {
 // example does not have a database, the complete Twitter profile is serialized
 // and deserialized.
 passport.serializeUser(function(user, cb) {
-  console.log(user);
+  // console.log(user);
   // console.log(user[0].dataValues.id);
   cb(null, user);
 });
 
 passport.deserializeUser(function(id, cb) {
-  console.log(`deserializing: id is ${id}`);
+  // console.log(`deserializing: id is ${id}`);
   User
     .findById(id.toString())
     .then( (user) => { return cb(null, user) } )

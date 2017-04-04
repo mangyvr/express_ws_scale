@@ -56,13 +56,18 @@
                                                 () => { sendChartWS(scaleSocket, 'lastMonth') } );
       document.getElementById('lastYearButton').addEventListener('click',
                                                 () => { sendChartWS(scaleSocket, 'lastYear') } );
-      // document.getElementById('enableTweet').addEventListener('click',
-      //                                           () => { sendChartWS(scaleSocket, 'lastYear') } );
+
+      const enableElement = document.getElementById('enableTweet');
+      if ( enableElement ) {
+        document.getElementById('enableTweet').addEventListener('click',
+                                                () => { sendChartWS(scaleSocket, 'toggleTweets') } );
+      }
 
       scaleSocket.onopen = (event) => {
         // Try to get data for current day ASAP
         scaleSocket.send( JSON.stringify( { queryType: 'lastDay' } ) );
         scaleSocket.send( JSON.stringify( { queryType: 'lastWeek' } ) );
+        scaleSocket.send( JSON.stringify( { queryType: 'updateSSMToken' } ) );
       }
 
       scaleSocket.onmessage = (event) => {
@@ -82,6 +87,12 @@
             updateBarChart(barChartSelectObj, incomingData.eventData);
             document.getElementById('timeframeText').innerHTML = incomingData.queryType.split('last')[1].toLowerCase();
             console.log(incomingData);
+          }
+        }
+        if ( incomingData.hasOwnProperty('tweetEnabled') ) {
+          const enableElement = document.getElementById('enableTweet');
+          if (enableElement) {
+              enableElement.innerHTML = incomingData.tweetEnabled ? "Disable Tweets" : "Enable Tweets";
           }
         }
         // scaleD = JSON.parse(event.data).scaleData;

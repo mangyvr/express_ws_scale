@@ -97,6 +97,10 @@ wss.on('connection', function connection(wssWs) {
       wrapQuery(1, 'year', Scale_stats, wssWs, dataObj.queryType);
     } else if (dataObj.queryType === 'lastWeek') {
       wrapQuery(7, 'day', Scale_stats, wssWs, dataObj.queryType);
+    } else if (dataObj.queryType === 'updateSSMToken'){
+      ssm.setOauth();
+    } else if (dataObj.queryType === 'toggleTweets') {
+      ssm.toggleTweets();
     }
   })
 });

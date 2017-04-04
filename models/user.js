@@ -5,7 +5,8 @@ module.exports = function(sequelize, DataTypes) {
     provider: DataTypes.STRING,
     oauth_token: DataTypes.STRING,
     oauth_secret: DataTypes.STRING,
-    oauth_raw_data: DataTypes.TEXT
+    oauth_raw_data: DataTypes.TEXT,
+    enable_tweet: DataTypes.BOOLEAN
   }, {
     classMethods: {
       associate: function(models) {
