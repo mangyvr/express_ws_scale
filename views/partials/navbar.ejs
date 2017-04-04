@@ -1,9 +1,24 @@
-<% if (user) { %>
-  <button id="enableTweet" class="btn btn-primary">Disable Tweets</button>
-  |
-  <a href="/logout">Logout</a>
-<% } else { %>
-  <a href="/auth/twitter"><img src="/images/sign-in-with-twitter-link.png"/> to control notifications</a>
-<% } %>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
 
-<hr>
+    <div class="navbar-header">
+      <a href="/"><img class="navbar-brand" src="/images/cup.png"/></a>
+    </div>
+
+    <ul class="nav navbar-nav navbar-left">
+      <li><a>Coffee Info</a></li>
+    </ul>
+
+    <ul class="nav navbar-nav navbar-right">
+      <% if (user) { %>
+        <li><a id="enableTweet" href="javascript:void(0);">Disable Tweets</a><li>
+        <li><a href="/logout">Logout</a></li>
+      <% } else { %>
+        <!-- <li><a href="/auth/twitter"><img src="/images/sign-in-with-twitter-link.png"/> <br>to control notifications</a></li> -->
+        <li><a href="/auth/twitter"><img src="/images/sign-in-with-twitter-link.png"/></a></li>
+        <!-- <li><a href="/auth/twitter">Sign into Twitter to control notifications</a></li> -->
+      <% } %>
+    </ul>
+
+  </div>
+</nav>

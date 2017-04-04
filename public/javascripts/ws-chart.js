@@ -12,6 +12,9 @@ function setupLineChart(scaleDataArr=[]) {
               }]
           },
     options: {
+                legend: {
+                  display: false
+                },
                 animation: {
                   duration: 0
                 }
