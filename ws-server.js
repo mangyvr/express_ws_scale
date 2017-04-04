@@ -52,8 +52,9 @@ const ws = new WebSocket('ws://192.168.10.123:3008');
 // Hardcoded scale id for now
 const ssm = new scaleSm( 1, Scale, Scale_stats, User );
 let scaleData = Array(1024).fill(0, 0, 1023);
+let tareData = Array(50).fill(0, 0, 49);
 let tareValue = 0;
-wsClient(scaleData, tareValue, ssm, ws);
+wsClient(scaleData, tareData, tareValue, ssm, ws);
 
 app.use(function(req,res,next) {
   console.log(`User hopefully from passport: ${res.user}`);
