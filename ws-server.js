@@ -25,7 +25,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 
 // Serve static files
@@ -45,13 +45,15 @@ const {Scale, Scale_stats, User} = require('./models/index');
 // ssm.setScaleModel( Scale, Scale_stats );
 
 const wsClient = require('./ws-client.js');
-let scaleData = Array(1024).fill(0, 0, 1023);
 // Establish WS outside so can be used in WS Server
 const WebSocket = require('ws');
-const ws = new WebSocket('https://4f568726.ngrok.io');
+// const ws = new WebSocket('https://4f568726.ngrok.io');
+const ws = new WebSocket('ws://192.168.10.123:3008');
 // Hardcoded scale id for now
 const ssm = new scaleSm( 1, Scale, Scale_stats, User );
-wsClient(scaleData, ssm, ws);
+let scaleData = Array(1024).fill(0, 0, 1023);
+let tareValue = 0;
+wsClient(scaleData, tareValue, ssm, ws);
 
 app.use(function(req,res,next) {
   console.log(`User hopefully from passport: ${res.user}`);

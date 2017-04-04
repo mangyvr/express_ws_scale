@@ -1,5 +1,5 @@
 // pass in the ws object of ws-server to send message on the new server
-let wsClient = function (scaleData, scaleSm, ws) {
+let wsClient = function (scaleData, tareValue, scaleSm, ws) {
 
   ws.on('open', function open() {
     console.log('WS scale connected');
