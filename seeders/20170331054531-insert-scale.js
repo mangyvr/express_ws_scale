@@ -15,6 +15,7 @@ module.exports = {
     const scales = Array.from(
       {length: 1},
       (value, index) => ({
+        id: 1,
         name: "Scale_1",
         path: "192.168.10.123:3008"
       })
