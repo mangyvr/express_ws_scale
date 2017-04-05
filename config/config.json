@@ -1,21 +1,21 @@
 {
   "development": {
-    "username": "tyt",
-    "password": null,
+    "username": "postgres",
+    "password": 12345,
     "database": "scale_dev",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "test": {
-    "username": "tyt",
-    "password": null,
+    "username": "postgres",
+    "password": 12345,
     "database": "scale_test",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "production": {
-    "username": "tyt",
-    "password": null,
+    "username": "postgres",
+    "password": 12345,
     "database": "scale_production",
     "host": "127.0.0.1",
     "dialect": "postgres"

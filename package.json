@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "source setenv.sh; PORT=3000 nodemon ws-server.js"
+    "start": "./setenv.sh && nodemon ws-server.js PORT=3000"
   },
   "dependencies": {
     "body-parser": "~1.16.0",

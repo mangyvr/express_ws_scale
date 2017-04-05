@@ -106,6 +106,7 @@ typings/
 
 # bash file setting env
 setenv.sh
+setenv.*
 
 ### Windows ###
 # Windows thumbnail cache files
