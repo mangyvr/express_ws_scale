@@ -23,3 +23,8 @@ body {
 .Aligner-item {
   max-width: 50%;
 }
+
+.btn-primary:hover {
+  background-color: chocolate;
+  transition: .4s;
+}
