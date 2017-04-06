@@ -46,6 +46,10 @@ let wsClient = function ( scaleData, tareData, tareValue, scaleSm, ws ) {
     console.log('WS scale closed');
   });
 
+  ws.on('error', function(event){
+    console.error(event);
+  });
+
   process.on('SIGINT', function() {
     console.log('Closing WS connection.');
     ws.close();
