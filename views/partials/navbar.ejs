@@ -12,7 +12,7 @@
     <ul class="nav navbar-nav navbar-right">
       <% if (user) { %>
         <%= console.log(user.dataValues) %>
-        <li><a href="javascript:void(0);">Hi @<%= JSON.parse(user.dataValues.oauth_raw_data).username %></a></li>
+        <li><a>Hi @<%= JSON.parse(user.dataValues.oauth_raw_data).username %></a></li>
         <li><a id="enableTweet" href="javascript:void(0);">Disable Tweets</a><li>
         <li><a href="/logout">Logout</a></li>
       <% } else { %>

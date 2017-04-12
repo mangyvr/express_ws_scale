@@ -52,8 +52,8 @@ const ws = new WebSocket('ws://192.168.10.123:3008');
 // Hardcoded scale id for now
 const ssm = new scaleSm( 1, Scale, Scale_stats, User );
 
-let scaleData = Array(1024).fill(0, 0, 1023);
-let tareData = Array(50).fill(0, 0, 49);
+let scaleData = Array(1024).fill(0, 0, 1024);
+let tareData = Array(50).fill(0, 0, 50);
 let tareValue = 0;
 wsClient(scaleData, tareData, tareValue, ssm, ws);
 
@@ -105,10 +105,35 @@ wss.on('connection', function connection(wssWs) {
       ssm.setOauth();
     } else if (dataObj.queryType === 'toggleTweets') {
       ssm.toggleTweets();
+    } else if (dataObj.queryType === 'fakeData') {
+      if ( dataObj.fakeDataType === 'increase' ) {
+        // console.log(scaleData.slice(scaleData.length-10));
+        pushDataAndSend(scaleData, 100, wssWs, ssm);
+      } else if ( dataObj.fakeDataType === 'decrease' ) {
+        pushDataAndSend(scaleData, -100, wssWs, ssm);
+      } else if ( dataObj.fakeDataType === 'advance' ) {
+        pushDataAndSend(scaleData, 0, wssWs, ssm);
+      }
     }
   })
 });
 
+function pushDataAndSend(scaleData, value, ws, scaleSm) {
+  console.log(scaleData[scaleData.length-1]);
+  scaleData.push( parseInt(scaleData[scaleData.length-1]) + value );
+  scaleData.unshift();
+
+  ws.send(JSON.stringify({ scaleData: scaleData }));
+
+  const AVG_LENGTH = 5;
+  let average = scaleData.slice(scaleData.length - AVG_LENGTH)
+    .reduce( (acc,val) => { return acc + val; }) / AVG_LENGTH;
+
+  scaleSm.setNextState(average);
+  if ( scaleSm.transitionReady() ) {
+    scaleSm.transition();
+  }
+}
 
 server.listen(process.env.PORT, function() {
   console.log(`http/ws server listening on ${process.env.PORT}`);

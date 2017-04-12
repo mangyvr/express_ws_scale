@@ -120,6 +120,11 @@ app.get('/scale_ws', function(req, res, next) {
   res.render('scale/scale-ws.ejs', {user: req.user});
 });
 
+app.get('/scale_ws_fake', function(req, res, next) {
+  // console.log(req.user);
+  res.render('scale/scale-ws-fake.ejs', {user: req.user});
+});
+
 app.get('/auth/twitter',
   passport.authenticate('twitter'));
 
