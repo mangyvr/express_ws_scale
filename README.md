@@ -7,3 +7,5 @@ This combined WebSocket/Express.js server requires a Raspberry Pi.  The Raspberr
 Usage
 
 Connect the Raspberry Pi with the load cell to a LAN.  Make sure the WS server is running, and that the IP address is the same as the address listed in ws-client.js.  Then start the Node.js server.
+
+As an alternative (without an Raspberry Pi), navigate to /scale_ws_fake to generate weight data using the 'w', 's', and 'd' keys.  'w' inserts a data point that is +100 of the previous point, while 's' inserts a data point that is -100 of the previous point.  'd' will insert a data point that is identical to the previous one.
