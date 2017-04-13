@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-default navbar-fixed-top">
   <div class="container-fluid">
 
     <div class="navbar-header">
@@ -11,12 +11,12 @@
 
     <ul class="nav navbar-nav navbar-right">
       <% if (user) { %>
+        <%= console.log(user.dataValues) %>
+        <li><a>Hi @<%= JSON.parse(user.dataValues.oauth_raw_data).username %></a></li>
         <li><a id="enableTweet" href="javascript:void(0);">Disable Tweets</a><li>
         <li><a href="/logout">Logout</a></li>
       <% } else { %>
-        <!-- <li><a href="/auth/twitter"><img src="/images/sign-in-with-twitter-link.png"/> <br>to control notifications</a></li> -->
-        <li><a href="/auth/twitter"><img src="/images/sign-in-with-twitter-link.png"/></a></li>
-        <!-- <li><a href="/auth/twitter">Sign into Twitter to control notifications</a></li> -->
+        <li><a href="/auth/twitter"><i class="fa fa-twitter"></i>&nbsp;Sign in to Twitter</a></li>
       <% } %>
     </ul>
 

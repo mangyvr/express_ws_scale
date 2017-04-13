@@ -6,9 +6,14 @@
   <script src="/public/javascripts/ws-chart.js"></script>
   <link rel="stylesheet" href="/stylesheets/scale-style.css">
 
+  <div class="jumboheader jumbotron vertical-align">
+    <h2 class="text-center">Coffee and Scale Information</h2>
+  </div>
+
   <div class="container">
     <!-- <h1>Coffee Info</h1> -->
-    <h2 class="text-center">Coffee and Scale Information</h2>
+    <!-- <h2 class="text-center">Coffee and Scale Information</h2> -->
+
     <h3 id="scaleChartText" class="text-center">Last 50 points</h3>
     <canvas id="scaleChart" height="100vh"></canvas>
 
@@ -18,9 +23,9 @@
     <h3 id="barChartSelectText" class="text-center">Events from past <span id="timeframeText">week<span></h3>
 
     <div class="event-buttons text-center">
-      <button id="lastWeekButton" class="btn btn-info">Last Week</button>
-      <button id="lastMonthButton" class="btn btn-info">Last Month</button>
-      <button id="lastYearButton" class="btn btn-info">Last Year</button>
+      <button id="lastWeekButton" class="btn btn-primary">Last Week</button>
+      <button id="lastMonthButton" class="btn btn-primary">Last Month</button>
+      <button id="lastYearButton" class="btn btn-primary">Last Year</button>
     </div>
     <canvas id="barChartSelect" height="75vh"></canvas>
   </div>

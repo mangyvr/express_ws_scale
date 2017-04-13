@@ -6,5 +6,31 @@
 }
 
 body {
-  background-color: whitesmoke;
+  /*background-color:  rgba(0, 89, 150, 0.2);*/
+  background-color: ghostwhite;
 }
+
+.vertical-align {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: 100vh;
+}
+
+.jumboheader {
+  background: linear-gradient(rgba(210, 100, 5, 0.8), rgba(0, 89, 150, 0.8)), url('/images/peggys_cove.jpg') center;
+  height: 25vh;
+  color: white;
+  margin-top: 0px;
+  /*padding-top: 0px;*/
+}
+
+.btn-primary:hover {
+  background-color: chocolate;
+  transition: .3s;
+}
+
+/*.navbar {
+  margin-bottom: 0px;
+}*/

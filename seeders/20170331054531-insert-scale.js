@@ -15,11 +15,12 @@ module.exports = {
     const scales = Array.from(
       {length: 1},
       (value, index) => ({
+        id: 1,
         name: "Scale_1",
-        path: "4f568726.ngrok.io"
+        path: "192.168.10.123:3008"
       })
     )
-    return queryInterface.bulkInsert('Scale', scales, {});
+    return queryInterface.bulkInsert('Scales', scales, {});
   },
 
   down: function (queryInterface, Sequelize) {
@@ -30,6 +31,6 @@ module.exports = {
       Example:
       return queryInterface.bulkDelete('Person', null, {});
     */
-    return queryInterface.bulkDelete('Scale', scales, {});
+    return queryInterface.bulkDelete('Scales', scales, {});
   }
 };

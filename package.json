@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "source setenv.sh; PORT=3000 nodemon ws-server.js"
+    "start": "nodemon ws-server.js PORT=3000"
   },
   "dependencies": {
     "body-parser": "~1.16.0",
@@ -14,6 +14,7 @@
     "ejs": "~2.5.5",
     "express": "~4.14.1",
     "express-session": "^1.15.1",
+    "faker": "^4.1.0",
     "jquery": "^3.2.1",
     "morgan": "~1.7.0",
     "nodemon": "^1.11.0",

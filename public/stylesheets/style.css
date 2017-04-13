@@ -2,10 +2,21 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+.navbar {
+  position: absolute;
+}
+
+.navbar-brand {
+  filter: invert(100%);
+}
+
 .navbar-default {
-  background-color: lightsteelblue;
+  /*background-color: lightsteelblue;*/
+  background-color: rgba(176, 196, 222, 0);
+  padding-bottom: 0px;
+  border: none;
 }
 
 .navbar .nav > li > a {
-  color: black;
+  color: white;
 }

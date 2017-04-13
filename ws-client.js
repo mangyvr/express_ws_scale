@@ -22,13 +22,6 @@ let wsClient = function ( scaleData, tareData, tareValue, scaleSm, ws ) {
     tareData.push(parseInt(currWeight));
 
     //average -- not sure if necessary
-    // let average = 0;
-    // const AVG_LENGTH = 10;
-    // scaleData.slice(scaleData.length - AVG_LENGTH).forEach( (data) => {
-    //   average += parseFloat(data);
-    // });
-    // average = average/AVG_LENGTH;
-
     const AVG_LENGTH = 5;
     let average = scaleData.slice(scaleData.length - AVG_LENGTH)
       .reduce( (acc,val) => { return acc + val; }) / AVG_LENGTH;
@@ -44,6 +37,10 @@ let wsClient = function ( scaleData, tareData, tareValue, scaleSm, ws ) {
 
   ws.on('close', function close() {
     console.log('WS scale closed');
+  });
+
+  ws.on('error', function(event){
+    console.error(event);
   });
 
   process.on('SIGINT', function() {

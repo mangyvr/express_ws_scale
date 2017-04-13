@@ -176,9 +176,6 @@ class Scale_sm {
       if (weight > this.TRANSITION_WEIGHT.ON_OFF) {
         this.nextState = 'coffee_on';
       }
-      // this.modelObj.scaleStatsModel
-      //   .all()
-      //   .then(console.dir);
     } else if (this.currentState === 'coffee_present' ) {
       if (weight < this.TRANSITION_WEIGHT.ON_OFF ) {
         this.nextState = 'coffee_off';
@@ -194,9 +191,6 @@ class Scale_sm {
            .create( {low_event: true, ScaleId: this.scale.id} )
            .then( () => { wrapQuery(1, 'day', this.modelObj.scaleStats, this.wssWs, 'lastDay'); } )
            .then( () => { this.sendTweet(`Low on coffee! ${Date()}`);} )
-           .catch(console.error);
-          //  .then( () => { } );
-          //  .then( () => { this.alreadyLow = true; } );
         }
       }
     } else if (this.currentState === 'coffee_off' ) {
@@ -221,7 +215,6 @@ class Scale_sm {
         .then( () => { this.sendTweet(`Coffee on the scale! ${Date()}`);} )
         .catch(console.error);
         // .then(console.log);
-
     } else { // invalid state
       console.error(this.currentState);
       console.error('SM in invalid state!!!');
