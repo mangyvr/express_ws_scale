@@ -52,7 +52,7 @@
     }
 
     function connectWs() {
-      const scaleSocket = new WebSocket("ws://localhost:3000");
+      const scaleSocket = new WebSocket("ws://" + window.location.host);
 
       const chartObj = setupLineChart(Array(50));
       const currDayBarObj = setupBarChart("barChartCurrDay", 'Number of Events', {});
