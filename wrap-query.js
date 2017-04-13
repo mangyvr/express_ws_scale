@@ -23,11 +23,12 @@ const wrapQuery = function(num, unit, model, ws, queryType) {
 
 const queryForLast = function(num, unit, event, model) {
   const Sequelize = require('sequelize');
+  let scaleDb = '';
   // Need this to make raw SQL queries
   if (process.env.NODE_ENV === 'production') {
-    const scaleDb = process.env.DATABASE_URL;
+    scaleDb = process.env.DATABASE_URL;
   } else {
-    const scaleDb = 'scale_dev';
+    scaleDb = 'scale_dev';
   }
 
   const sequelize = new Sequelize(scaleDb, 'postgres', 12345 ,{
