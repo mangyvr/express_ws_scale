@@ -23,17 +23,19 @@ const wrapQuery = function(num, unit, model, ws, queryType) {
 
 const queryForLast = function(num, unit, event, model) {
   const Sequelize = require('sequelize');
-  let scaleDb = '';
+  let sequelize;
   // Need this to make raw SQL queries
   if (process.env.NODE_ENV === 'production') {
-    scaleDb = process.env.DATABASE_URL;
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
+      dialect: 'postgres'
+    });
   } else {
-    scaleDb = 'scale_dev';
+    sequelize = new Sequelize('scale_dev', 'postgres', 12345, {
+      dialect: 'postgres'
+    });
   }
 
-  const sequelize = new Sequelize(scaleDb, 'postgres', 12345 ,{
-    dialect: 'postgres'
-  });
+
 
   return new Promise((resolve, reject) => {
     sequelize.query(`SELECT COUNT(*) FROM "Scale_stats" WHERE "createdAt" > current_date - interval '${num}' ${unit} AND ${event}=true`,
