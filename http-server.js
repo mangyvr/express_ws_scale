@@ -17,7 +17,7 @@ const {User} = require('./models/index');
 passport.use(new Strategy({
   consumerKey: process.env.CONSUMER_KEY,
   consumerSecret: process.env.CONSUMER_SECRET,
-  callbackURL: 'http://localhost:3000/auth/twitter/callback'
+  callbackURL: 'http://coffee-sensr.herokuapp.com/auth/twitter/callback'
 },
 function(token, tokenSecret, profile, cb) {
   // In this example, the user's Twitter profile is supplied as the user
